@@ -16,13 +16,14 @@ Current features:
 
 ## Build
 
-To build the project, run:
+You need `arm-none-eabi-gcc` and `make`
 
 ```bash
-make
+make       # build 'firmware.s37' in the bin/ directory
+make elf   # build 'firmware.elf' only in the build/ directory
 ```
 
-This will compile the binary file to be flashed in the chip
+The final file to flash is `bin/firmware.s37`
 
 ## Hardware Used
 

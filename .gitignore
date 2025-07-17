@@ -4,11 +4,17 @@
 *.zip*
 *.7z*
 
-# binaries
+# out/binaries
 *.bin
-*.ota
 *.hex
 *.out
 *.s37
 *.map
-*.gbl
+*.elf
+
+# produced dir
+build/
+bin/
+
+# ide
+.clangd
