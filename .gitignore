@@ -1,0 +1,14 @@
+# archive format
+*.tgz*
+*.gz*
+*.zip*
+*.7z*
+
+# binaries
+*.bin
+*.ota
+*.hex
+*.out
+*.s37
+*.map
+*.gbl
