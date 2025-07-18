@@ -159,9 +159,9 @@ uint32_t vectors[] __attribute__ ((section(".isr_vector")))= {
 
 void Copy_Table(void);
 void Zero_Table(void);
+
 extern int main(void);
 
-// TODO: Copy_Table and Zero_Table
 void Reset_Handler(void)
 {
 	//	SystemInit();   /* CMSIS System Initialization */
@@ -176,6 +176,7 @@ void Reset_Handler(void)
 void Default_Handler(void) {
 	while (1);
 }
+
 extern uint32_t	_la_data;
 extern uint32_t	_sdata;
 extern uint32_t	_edata;
