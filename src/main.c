@@ -1,15 +1,8 @@
 #include <stdint.h>
+
+#include "cmu.h"
+#include "rtcc.h"
 #include "timer.h"
-
-#define CMU_BASE			(0x400E4000UL) /* CMU base address  */
-
-// BUS clock
-#define HFBUSCLKEN0_OFFSET	(0x0B0UL)
-#define HFBUSCLKEN0			(*(volatile uint32_t *)(CMU_BASE + HFBUSCLKEN0_OFFSET))
-
-// Peripherals clock (bit 0 timer 0, bit 1 timer 1)
-#define HFPERCLKEN0_OFFSET	(0x0C0UL)
-#define HFPERCLKEN0			(*(volatile uint32_t *)(CMU_BASE + HFPERCLKEN0_OFFSET))
 
 // base for GPIO
 #define GPIO_BASE		(0x4000A000UL)
@@ -66,24 +59,37 @@ void timer0_init(void)
 
 int main(void)
 {
-	HFBUSCLKEN0 |= (1 << 3);	// set the bit 3 to enable GPIO CLK
-	HFPERCLKEN0 |= (1 << 0);	// enable TIMER0 clock
+	// Enable HFXCLK
+	CMU->OSCENCMD = CMU_OSCENCMD_HFXOEN;
+
+	while ((CMU->STATUS & CMU_STATUS_HFXORDY) == 0)
+	{
+		__asm__("nop");
+	}
+
+	// set HFXTAL as the HFCLK
+	CMU->HFCLKSEL = CMU_HFCLKSEL_HFXO;
+	
+	CMU->HFBUSCLKEN0 |= (1 << 3);	// set the bit 3 to enable GPIO CLK
+// Peripherals clock (bit 0 timer 0, bit 1 timer 1)
+	CMU->HFPERCLKEN0 |= (1 << 0);	// enable TIMER0 clock
 
 	init_leds();
 	timer0_init();
 
-	while (!(TIMER0->STATUS & 1));
+	//while (!(TIMER0->STATUS & 1));
+
+	uint32_t	start = TIMER0->CNT;
+
 	while (1)
 	{
-		uint32_t ms = TIMER0->CNT / 1000;
-		uint32_t mod = ms % 10;
-
-		if (mod == 5)
+		uint32_t elapsed = TIMER0->CNT - start;
+		if (elapsed < (TIMER0->TOP/2))
 		{
 			GPIO_PF_DOUT |= (1 << LED0_PIN);
 			GPIO_PF_DOUT &= ~(1 << LED1_PIN);
 		}
-		else if (mod == 0)
+		else
 		{
 			GPIO_PF_DOUT &= ~(1 << LED0_PIN);
 			GPIO_PF_DOUT |= (1 << LED1_PIN);
