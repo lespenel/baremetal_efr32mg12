@@ -121,9 +121,15 @@ typedef struct
 #define CMU_HFCLKSEL_HFRCODIV2	5
 #define CMU_HFCLKSEL_CLKIN0		7
 
-#define CMU_OSCENCMD_LFXOEN		(1 << 8)
-#define CMU_OSCENCMD_HFXOEN		(1 << 2)
+#define CMU_OSCENCMD_LFXOEN		(1UL << 8)
+#define CMU_OSCENCMD_HFXOEN		(1UL << 2)
 
-#define CMU_STATUS_HFXORDY		(1 << 3)
+#define CMU_STATUS_HFXORDY		(1UL << 3)
+#define CMU_STATUS_LFXORDY		(1UL << 9)
+#define CMU_STATUS_CALRDY		(1UL << 16)
+
+#define CMU_CMD_CALSTART		(1UL << 0)
+
+#define CMU_CALCTRL_UPSEL_LFXO	(1UL << 0)
 
 #endif

@@ -48,4 +48,6 @@ typedef struct
 
 #define TIMER0 ((TIMER_TypeDef *) TIMER0_BASE)
 
+#define TIMER_IEN_OF	(1UL << 0)
+
 #endif
