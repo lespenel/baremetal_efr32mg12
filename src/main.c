@@ -1,8 +1,10 @@
 #include <stdint.h>
 
 #include "cmu.h"
-#include "timer.h"
 #include "nvic.h"
+#include "timer.h"
+
+#include "dcdc_driver.h"
 
 // base for GPIO
 #define GPIO_BASE		(0x4000A000UL)
@@ -107,19 +109,16 @@ uint32_t calibrate_hfxo(uint32_t HFCycles)
 
 int main(void)
 {
+	DCDCInit();
 	init_hfxo();
 	init_lfxo();
 	uint32_t hfx_freq = calibrate_hfxo(1000000);
 	(void)hfx_freq;
 
-	float d = 5;
-	(void)d;
-
 	// set HFXTAL as the HFCLK
 	CMU->HFCLKSEL = CMU_HFCLKSEL_HFXO;
 	
 	CMU->HFBUSCLKEN0 |= (1 << 3);	// set the bit 3 to enable GPIO CLK
-// Peripherals clock (bit 0 timer 0, bit 1 timer 1)
 	CMU->HFPERCLKEN0 |= (1 << 0);	// enable TIMER0 clock
 
 	init_leds();
@@ -130,14 +129,12 @@ int main(void)
 
 	// Enable TIMER0 interupt in the NVIC
 	NVIC->ISER[0] = (1UL << 11);
-	//while (!(TIMER0->STATUS & 1));
 
 	uint32_t	start = TIMER0->CNT;
-
 	while (1)
 	{
 		uint32_t elapsed = TIMER0->CNT - start;
-		if (elapsed < (TIMER0->TOP/2))
+		if (elapsed < (TIMER0->TOP / 2))
 		{
 			GPIO_PF_DOUT |= (1 << LED0_PIN);
 			GPIO_PF_DOUT &= ~(1 << LED1_PIN);

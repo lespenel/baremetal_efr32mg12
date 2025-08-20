@@ -1,2 +1,3 @@
 SRC := startup.c \
-	   main.c
+	   main.c \
+	   dcdc_driver.c
