@@ -1,3 +1,5 @@
 SRC := startup.c \
 	   main.c \
-	   dcdc_driver.c
+	   \
+	   drivers/clock_driver.c \
+	   drivers/dcdc_driver.c

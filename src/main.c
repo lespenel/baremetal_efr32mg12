@@ -4,6 +4,7 @@
 #include "nvic.h"
 #include "timer.h"
 
+#include "clock_driver.h"
 #include "dcdc_driver.h"
 
 // base for GPIO
@@ -25,22 +26,6 @@
 
 #define LED0_PIN 4
 #define LED1_PIN 5
-
-// Need to be calibrated
-#define FREQ_HFXO	38400000UL
-#define FREQ_LFXO	32768UL
-
-void sleep_ms(uint32_t time_MS)
-{
-	uint32_t wait_tick = time_MS * (FREQ_HFXO / 1000 / 1024);
-	uint32_t start = TIMER0->CNT;
-	uint32_t elapsed = TIMER0->CNT - start;
-
-	while (elapsed < wait_tick)
-	{
-		elapsed = TIMER0->CNT - start;
-	}
-}
 
 void init_leds(void)
 {
@@ -69,51 +54,11 @@ void timer0_init(void)
 	TIMER0->CMD = 1;
 }
 
-void init_hfxo(void)
-{
-	// Enable HFXCLK
-	CMU->OSCENCMD = CMU_OSCENCMD_HFXOEN;
-
-	while ((CMU->STATUS & CMU_STATUS_HFXORDY) == 0)
-	{
-		__asm__("nop");
-	}
-}
-
-void init_lfxo(void)
-{
-	// Enable LFXCLK
-	CMU->OSCENCMD = CMU_OSCENCMD_LFXOEN;
-
-	while ((CMU->STATUS & CMU_STATUS_LFXORDY) == 0)
-	{
-		__asm__("nop");
-	}
-}
-
-uint32_t calibrate_hfxo(uint32_t HFCycles)
-{
-	CMU->CALCTRL =  CMU_CALCTRL_UPSEL_LFXO;
-
-	CMU->CALCNT	= HFCycles;
-
-	CMU->CMD = CMU_CMD_CALSTART;
-
-	while ((CMU->STATUS & CMU_STATUS_CALRDY) == 0UL)
-	{
-		__asm__("nop");
-	}
-
-	return (CMU->CALCNT);
-}
-
 int main(void)
 {
 	DCDCInit();
 	init_hfxo();
 	init_lfxo();
-	uint32_t hfx_freq = calibrate_hfxo(1000000);
-	(void)hfx_freq;
 
 	// set HFXTAL as the HFCLK
 	CMU->HFCLKSEL = CMU_HFCLKSEL_HFXO;
