@@ -2,6 +2,7 @@
 # define NVIC_H
 
 #include <stdint.h>
+
 typedef struct
 {
 	volatile uint32_t	ICTR;			/* Interrupt Controller Type Register, ICTR */
