@@ -17,7 +17,7 @@ OBJCOPY := arm-none-eabi-objcopy
 MATCH := cortex-m4
 MCUFLAGS := -mcpu=$(MATCH) -mthumb
 
-CFLAGS := -c $(MCUFLAGS) -std=c99 -Wall -Wextra -Werror \
+CFLAGS := -c $(MCUFLAGS) -std=c99 -g -O0 -Wall -Wextra -Werror \
 		  -I $(INC)
 
 LDFLAGS := -T $(LINKER_DIR)/linker.ld -nostdlib -Wl,-Map=$(MAP)

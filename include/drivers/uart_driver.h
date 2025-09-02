@@ -17,8 +17,7 @@ typedef struct
 
 }	UART_Config_TypeDef;
 
-void	init_uart(UART_Config_TypeDef *cfg);
+void	uart_init(UART_Config_TypeDef *cfg);
 void	uart_putchar(USART_TypeDef *UART, unsigned char c);
-void	uart_putstring(USART_TypeDef *UART, char *str);
 
 #endif

@@ -15,6 +15,7 @@
 # produced dir
 build/
 bin/
+.vscode/
 
 # ide
 .clangd
