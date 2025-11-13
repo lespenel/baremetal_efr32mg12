@@ -4,6 +4,7 @@
 #include "usart.h"
 
 #include "drivers/gpio_driver.h"
+#include <stdint.h>
 #include "drivers/uart_driver.h"
 
 static inline uint32_t	get_usart_clock_shift(USART_TypeDef *uart);
@@ -39,9 +40,9 @@ void	uart_init(UART_Config_TypeDef *cfg)
 		enable_vcom();
 
 	cfg->UART->ROUTELOC0 = (cfg->tx_loc << 8) | (cfg->rx_loc << 0);
-	cfg->UART->ROUTEPEN = USART_ROUTEPEN_TXPEN;
+	cfg->UART->ROUTEPEN = USART_ROUTEPEN_TXPEN | USART_ROUTEPEN_RXPEN;
 	
-	cfg->UART->CMD = USART_CMD_TXEN; // Enable TX
+	cfg->UART->CMD = USART_CMD_TXEN | USART_CMD_RXEN; // Enable TX
 }
 
 /**
@@ -53,6 +54,15 @@ void	uart_putchar(USART_TypeDef *UART, unsigned char c)
 
 	// Wait until the Transmission is complete
 	while ((UART->STATUS & USART_STATUS_TXC) == 0);
+}
+
+char	uart_getchar(USART_TypeDef *UART)
+{
+	while ((UART->STATUS & USART_STATUS_RXDATAV) == 0);
+	char c = UART->RXDATA & 0xFFUL;
+
+	uart_putchar(UART, c);
+	return (c);
 }
 
 static inline uint32_t	get_usart_clock_shift(USART_TypeDef *uart)

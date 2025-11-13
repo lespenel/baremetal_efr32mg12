@@ -3,6 +3,8 @@
 #include "drivers/uart_driver.h"
 #include "gpio.h"
 #include "util.h"
+#include <stddef.h>
+#include "io/uart_io.h"
 
 /**
  * @brief Send a Null terminated string via UART
@@ -63,6 +65,56 @@ void	uart_print_uint(USART_TypeDef *UART, uint32_t nb)
 	while (buff[to_skip] == 0)
 		++to_skip;
 	uart_putstring_crlf(UART, buff + to_skip);
+}
+
+ssize_t	read(int fd, void *buff, size_t count)
+{
+	(void)fd;
+	size_t	i = 0;
+	while (i < count)
+	{
+		((char *)buff)[i] = uart_getchar(USART0);
+		++i;
+	}
+	return (count);
+}
+
+int bm_strncmp(char *s1, char *s2, size_t n)
+{
+	size_t i = 0;
+
+	while (s1[i] && s1[i] != s2[i] && i < n - 1)
+		++i;
+	return (s1[i] - s2[i]);
+}
+
+char *bm_strstr(char *big, char *litle)
+{
+	size_t len = bm_strlen(litle);
+
+	while (*big)
+	{
+		if (bm_strncmp(big, litle, len) == 0)
+			return (big);
+		++big;
+	}
+	return (0);
+}
+
+void	uart_getline(USART_TypeDef *uart, char *buff, size_t size)
+{
+	uart_putstring(uart, CLI_PROMPT);
+
+	char c = 0;
+	for (uint64_t i = 0; i < size; ++i)
+	{
+		c = uart_getchar(uart);
+		if (c)
+			buff[i] = c;
+		if (c == 0 || bm_strstr(buff, "\r\n") || bm_strstr(buff, "\n"))
+			return;
+		c = 0;
+	}
 }
 
 void	config_usart0(void)

@@ -14,6 +14,8 @@ typedef struct
 }	TIMER_CC_TypeDef;
 
 
+uint32_t	timer0_get_overflow_count(void);
+
 // Register Map (p.697 of the RM)
 typedef struct
 {

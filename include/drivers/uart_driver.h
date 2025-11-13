@@ -19,5 +19,6 @@ typedef struct
 
 void	uart_init(UART_Config_TypeDef *cfg);
 void	uart_putchar(USART_TypeDef *UART, unsigned char c);
+char	uart_getchar(USART_TypeDef *UART);
 
 #endif

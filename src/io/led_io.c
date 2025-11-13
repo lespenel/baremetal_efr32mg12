@@ -21,3 +21,13 @@ void	leds_set(uint8_t led0, uint8_t led1)
 	else
 		GPIO->P[GPIO_PORTF].DOUT &= ~(1 << LED1_PIN);
 }
+
+void	led0_toggle(void)
+{
+	GPIO->P[GPIO_PORTF].DOUTTGL |= (1 << LED0_PIN);
+}
+
+void	led1_toggle(void)
+{
+	GPIO->P[GPIO_PORTF].DOUTTGL |= (1 << LED1_PIN);
+}
