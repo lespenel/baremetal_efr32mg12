@@ -1,10 +1,10 @@
+#include <stddef.h>
+
 #include "config.h"
-#include "drivers/gpio_driver.h"
 #include "drivers/uart_driver.h"
 #include "gpio.h"
+#include "nvic.h"
 #include "util.h"
-#include <stddef.h>
-#include "io/uart_io.h"
 
 /**
  * @brief Send a Null terminated string via UART
@@ -67,54 +67,64 @@ void	uart_print_uint(USART_TypeDef *UART, uint32_t nb)
 	uart_putstring_crlf(UART, buff + to_skip);
 }
 
-ssize_t	read(int fd, void *buff, size_t count)
+/**
+ * @brief extracts one complete line from the UART RX ring buffer.
+ * It reads characters until an input-separator (IFS) is encountered,
+ * stores them in buff, null-terminates the string, 
+ * and consumes any trailing IFS characters. 
+ *
+ * If a line was received but contains no characters (e.g., user pressed Enter),
+ * the function returns 1. 
+ * If no line is available, it returns 0. 
+ * Otherwise, it returns the number of characters read
+ *
+ * @param uart uart to read the data from
+ * @param buff buffer to store the readed line
+ * @param size size of the input buffer
+ *
+ * @return 0 if no line is availabe,
+ *		   1 if an empty line was received,
+ *		   or the number of characters read.
+ */
+size_t	uart_readline(USART_TypeDef *uart, char *buff, size_t size)
 {
-	(void)fd;
-	size_t	i = 0;
-	while (i < count)
+	t_uart_rx	*rx = get_uart_rx(uart);
+	size_t		i = 0;
+	size_t		ifs_consumed = 0;
+
+	if (rx->ifs == -1)
+		return (0);
+	while (rx->len != 0 && i < size - 1 &&
+		bm_strchr(UART_RX_IFS, rx->buffer[rx->tail]) == NULL)
 	{
-		((char *)buff)[i] = uart_getchar(USART0);
+		buff[i] = uart_rx_consume(rx);
 		++i;
 	}
-	return (count);
+	buff[i] = '\0';
+	while (rx->len && bm_strchr(UART_RX_IFS, rx->buffer[rx->tail]))
+	{
+		uart_rx_consume(rx);
+		ifs_consumed = 1;
+	}
+	rx->ifs = -1;
+	if (i == 0 && ifs_consumed)
+		return (1);
+	return (i);
 }
 
-int bm_strncmp(char *s1, char *s2, size_t n)
+size_t	uart_read(USART_TypeDef *uart, char *buff, size_t size)
 {
-	size_t i = 0;
+	t_uart_rx	*rx = get_uart_rx(uart);
+	size_t		i = 0;
 
-	while (s1[i] && s1[i] != s2[i] && i < n - 1)
+	while (rx->len != 0 && i < size)
+	{
+		buff[i] = rx->buffer[rx->tail];
+		rx->tail = (rx->tail + 1) % UART_BUFFER_SIZE;
+		--rx->len;
 		++i;
-	return (s1[i] - s2[i]);
-}
-
-char *bm_strstr(char *big, char *litle)
-{
-	size_t len = bm_strlen(litle);
-
-	while (*big)
-	{
-		if (bm_strncmp(big, litle, len) == 0)
-			return (big);
-		++big;
 	}
-	return (0);
-}
-
-void	uart_getline(USART_TypeDef *uart, char *buff, size_t size)
-{
-	uart_putstring(uart, CLI_PROMPT);
-
-	char c = 0;
-	for (uint64_t i = 0; i < size; ++i)
-	{
-		c = uart_getchar(uart);
-		if (c)
-			buff[i] = c;
-		if (c == 0 || bm_strstr(buff, "\r\n") || bm_strstr(buff, "\n"))
-			return;
-		c = 0;
-	}
+	return (i);
 }
 
 void	config_usart0(void)
@@ -151,4 +161,6 @@ void	config_usart3(void)
 	usart3_config.tx_port = GPIO_PORTB;
 	usart3_config.rx_port = GPIO_PORTB;
 	uart_init(&usart3_config);
+	NVIC_interupt_set_enable(NVIC_IRQ_USART3_RX);
+	USART3->IEN |= (1UL << 2);
 }

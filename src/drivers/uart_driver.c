@@ -4,12 +4,16 @@
 #include "usart.h"
 
 #include "drivers/gpio_driver.h"
-#include <stdint.h>
 #include "drivers/uart_driver.h"
 
 static inline uint32_t	get_usart_clock_shift(USART_TypeDef *uart);
 static void	set_baud_rate(USART_TypeDef *UART, uint32_t baud_rate);
 static void	enable_vcom(void);
+
+static t_uart_rx	uart0_rx = {{0}, 0, 0, 0, -1};
+static t_uart_rx	uart1_rx = {{0}, 0, 0, 0, -1};
+static t_uart_rx	uart2_rx = {{0}, 0, 0, 0, -1};
+static t_uart_rx	uart3_rx = {{0}, 0, 0, 0, -1};
 
 /**
  * @brief Configure and Enable the specified USART in asynchronous mode
@@ -63,6 +67,40 @@ char	uart_getchar(USART_TypeDef *UART)
 
 	uart_putchar(UART, c);
 	return (c);
+}
+
+char	uart_rx_consume(t_uart_rx *rx)
+{
+	char	c;
+
+	if (rx->len == 0)
+		return ('\0');
+	c = rx->buffer[rx->tail];
+	rx->tail = (rx->tail + 1) % UART_BUFFER_SIZE;
+	--rx->len;
+	return (c);
+}
+
+void	uart_rx_insert(t_uart_rx *rx, char c)
+{
+	rx->buffer[rx->head] = c;
+	rx->head = (rx->head + 1) % UART_BUFFER_SIZE;
+
+	if (rx->len < UART_BUFFER_SIZE)
+		++rx->len;
+	else
+		rx->tail = (rx->tail + 1) % UART_BUFFER_SIZE;
+}
+
+t_uart_rx	*get_uart_rx(USART_TypeDef *uart)
+{
+	if (uart == USART0)
+		return (&uart0_rx);
+	if (uart == USART1)
+		return (&uart1_rx);
+	if (uart == USART2)
+		return (&uart2_rx);
+	return (&uart3_rx);
 }
 
 static inline uint32_t	get_usart_clock_shift(USART_TypeDef *uart)

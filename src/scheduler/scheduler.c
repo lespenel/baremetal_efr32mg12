@@ -1,16 +1,23 @@
-#include "scheduler.h"
-#include "io/led_io.h"
-#include "timer.h"
+#include <stddef.h>
 #include <stdint.h>
 
-
+#include "config.h"
+#include "io/led_io.h"
 #include "io/uart_io.h"
+#include "scheduler.h"
+#include "timer.h"
+
 void	prompt_task(void)
 {
 	char buff[1024] = {0};
+	size_t	ret = uart_readline(USART3, buff, 1024);
 
-	uart_getline(USART3, buff, 1024);
-	uart_putstring(USART3, buff);
+	if (ret != 0)
+	{
+		if (buff[0])
+			uart_putstring_crlf(USART3, buff);
+		uart_putstring(USART3, CLI_PROMPT);
+	}
 }
 
 void	led_task(void)
