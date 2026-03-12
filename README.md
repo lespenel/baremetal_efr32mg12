@@ -6,13 +6,16 @@
 
 ## Overview
 
-This project contains a bare-metal firmware written for the EFR32MG12P microcontroller.
-It is designed to run without any operating system or hardware abstraction layer (HAL),
-providing full control over the hardware.
+Minimal bare-metal firmware for the **EFR32MG12P** microcontroller, written in C without an OS, vendor HAL, or external runtime.
 
-Current features:
-- Minimal startup code
-- LED blinking via GPIO
+This project aims to provide a small and understandable embedded base with:
+- custom startup code
+- direct register-level peripheral access
+- simple cooperative task scheduling
+- UART driver with RX interrupt and ring buffer
+- basic CLI-style serial input handling
+- LED control through GPIO
+- timer-based software timing
 
 ## Build
 
