@@ -1,9 +1,6 @@
 #include <stddef.h>
 
-#include "config.h"
 #include "drivers/uart_driver.h"
-#include "gpio.h"
-#include "nvic.h"
 #include "util.h"
 
 /**
@@ -125,42 +122,4 @@ size_t	uart_read(USART_TypeDef *uart, char *buff, size_t size)
 		++i;
 	}
 	return (i);
-}
-
-void	config_usart0(void)
-{
-	UART_Config_TypeDef	usart3_config;
-
-	memset(&usart3_config, 0, sizeof(UART_Config_TypeDef));
-
-	usart3_config.tx_pin = 0;
-	usart3_config.rx_pin = 1;
-	usart3_config.vcom_enable = 1;
-	usart3_config.baud_rate = USART_DESIRED_BAUD_RATE;
-	usart3_config.tx_loc = 0;
-	usart3_config.rx_loc = 0;
-	usart3_config.UART = USART0;
-	usart3_config.tx_port = GPIO_PORTA;
-	usart3_config.rx_port = GPIO_PORTA;
-	uart_init(&usart3_config);
-}
-
-void	config_usart3(void)
-{
-	UART_Config_TypeDef	usart3_config;
-
-	memset(&usart3_config, 0, sizeof(UART_Config_TypeDef));
-
-	usart3_config.tx_pin = 6;
-	usart3_config.rx_pin = 7;
-	usart3_config.vcom_enable = 0;
-	usart3_config.baud_rate = USART_DESIRED_BAUD_RATE;
-	usart3_config.tx_loc = 10;
-	usart3_config.rx_loc = 10;
-	usart3_config.UART = USART3;
-	usart3_config.tx_port = GPIO_PORTB;
-	usart3_config.rx_port = GPIO_PORTB;
-	uart_init(&usart3_config);
-	NVIC_interupt_set_enable(NVIC_IRQ_USART3_RX);
-	USART3->IEN |= (1UL << 2);
 }

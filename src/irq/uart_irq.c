@@ -1,12 +1,13 @@
 #include <stddef.h>
 
 #include "drivers/uart_driver.h"
+#include "usart_reg.h"
 #include "util.h"
 
-void USART3_RX_IRQHandler(void)
+void	usart_rx_irq_handler(USART_TypeDef *USART)
 {
-	char		c = USART3->RXDATA & 0xFFUL;
-	t_uart_rx	*rx = get_uart_rx(USART3);
+	char		c = USART->RXDATA & 0xFFUL;
+	t_uart_rx	*rx = get_uart_rx(USART);
 
 	if (rx->ifs != -1)
 		return ;
@@ -16,7 +17,27 @@ void USART3_RX_IRQHandler(void)
 
 	uart_rx_insert(rx, c);
 
-	USART3->IFC |= (1UL << 2);
+	USART->IFC |= (1UL << 2);
 
-	uart_putchar(USART3, c);
+	uart_putchar(USART, c);
+}
+
+void USART0_RX_IRQHandler(void)
+{
+	usart_rx_irq_handler(USART0);
+}
+
+void USART1_RX_IRQHandler(void)
+{
+	usart_rx_irq_handler(USART1);
+}
+
+void USART2_RX_IRQHandler(void)
+{
+	usart_rx_irq_handler(USART2);
+}
+
+void USART3_RX_IRQHandler(void)
+{
+	usart_rx_irq_handler(USART3);
 }

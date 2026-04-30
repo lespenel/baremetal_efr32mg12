@@ -11,10 +11,13 @@ SRC := main.c \
 	   \
 	   io/uart_io.c \
 	   \
+	   bsp/board_init.c \
 	   bsp/leds.c \
 	   \
 	   irq/timer_irq.c \
 	   irq/uart_irq.c \
+	   \
+	   lib/ringbuf.c \
 	   \
 	   utils/bm_itoa.c \
 	   utils/bm_regtoa.c \

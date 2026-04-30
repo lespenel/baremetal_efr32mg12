@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "usart.h"
+#include "usart_reg.h"
 
 typedef struct
 {

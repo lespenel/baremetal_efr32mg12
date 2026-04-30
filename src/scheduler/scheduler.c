@@ -11,20 +11,20 @@
 void	prompt_task(void)
 {
 	char buff[1024] = {0};
-	size_t	ret = uart_readline(USART3, buff, 1024);
+	size_t	ret = uart_readline(USART0, buff, 1024);
 
 	if (ret != 0)
 	{
 		if (buff[0])
-			uart_putstring_crlf(USART3, buff);
-		uart_putstring(USART3, CLI_PROMPT);
+			uart_putstring_crlf(USART0, buff);
+		uart_putstring(USART0, CLI_PROMPT);
 	}
 }
 
 void	led_task(void)
 {
-	led0_toggle();
-	led1_toggle();
+	// led0_toggle();
+	// led1_toggle();
 }
 
 #define TASKS_NB 2

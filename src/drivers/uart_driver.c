@@ -1,7 +1,7 @@
 #include "cmu.h"
 #include "config.h"
 #include "gpio.h"
-#include "usart.h"
+#include "usart_reg.h"
 
 #include "drivers/gpio_driver.h"
 #include "drivers/uart_driver.h"
