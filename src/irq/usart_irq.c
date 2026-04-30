@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-#include "drivers/uart_driver.h"
+#include "drivers/usart_driver.h"
 #include "usart_reg.h"
 #include "util.h"
 
@@ -12,7 +12,7 @@ void	usart_rx_irq_handler(USART_TypeDef *USART)
 	if (rx->ifs != -1)
 		return ;
 	// set the flag if an input separator is found
-	if (bm_strchr(UART_RX_IFS, c))
+	if (bm_strchr(USART_RX_IFS, c))
 		rx->ifs = rx->head;
 
 	uart_rx_insert(rx, c);

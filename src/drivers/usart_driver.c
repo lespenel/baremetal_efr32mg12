@@ -4,7 +4,7 @@
 #include "usart_reg.h"
 
 #include "drivers/gpio_driver.h"
-#include "drivers/uart_driver.h"
+#include "drivers/usart_driver.h"
 
 static inline uint32_t	get_usart_clock_shift(USART_TypeDef *uart);
 static void	set_baud_rate(USART_TypeDef *UART, uint32_t baud_rate);
@@ -15,38 +15,43 @@ static t_uart_rx	uart1_rx = {{0}, 0, 0, 0, -1};
 static t_uart_rx	uart2_rx = {{0}, 0, 0, 0, -1};
 static t_uart_rx	uart3_rx = {{0}, 0, 0, 0, -1};
 
+#include "lib/ringbuf.h"
+
 /**
  * @brief Configure and Enable the specified USART in asynchronous mode
  *	specified in 'cfg'
  *
  * @param cfg Configuration struct containing the USARTn
  */
-void	uart_init(UART_Config_TypeDef *cfg)
+void	uart_init(t_usart *usart, const t_usart_config *cfg)
 {
-	CMU->HFPERCLKEN0 |= (1 << get_usart_clock_shift(cfg->UART)); // enable clock
+	usart->USART = cfg->USART;
+	ringbuf_init(&usart->ringbuf);
+
+	CMU->HFPERCLKEN0 |= (1 << get_usart_clock_shift(usart->USART)); // enable clock
 
 	enable_gpio_port(cfg->tx_port, cfg->tx_pin, gpio_mode_PUSHPULL);
 	enable_gpio_port(cfg->rx_port, cfg->rx_pin, gpio_mode_INPUT);
 
 	// The USART operates in asynchronous mode when SYNC in USARTn_CTRL is cleared to 0	
-	cfg->UART->CTRL &= ~USART_CTRL_SYNC;
-	cfg->UART->CTRL &= ~USART_CTRL_LOOPBK;
+	usart->USART->CTRL &= ~USART_CTRL_SYNC;
+	usart->USART->CTRL &= ~USART_CTRL_LOOPBK;
 
 	// The number of data bits in a frame is set by DATABITS in USARTn_FRAME
 	// and the number of stop-bits is set by STOPBITS in USARTn_FRAME
 	// Whether or not a parity bit should be included, and even or odd is defined by PARITY
-	cfg->UART->FRAME = USART_FRAME_DATABITS_EIGHT
+	usart->USART->FRAME = USART_FRAME_DATABITS_EIGHT
 					| USART_FRAME_STOPBITS_ONE
 					| (0 << 8);
 
-	set_baud_rate(cfg->UART, USART_DESIRED_BAUD_RATE);
+	set_baud_rate(usart->USART, USART_DESIRED_BAUD_RATE);
 	if (cfg->vcom_enable)
 		enable_vcom();
 
-	cfg->UART->ROUTELOC0 = (cfg->tx_loc << 8) | (cfg->rx_loc << 0);
-	cfg->UART->ROUTEPEN = USART_ROUTEPEN_TXPEN | USART_ROUTEPEN_RXPEN;
+	usart->USART->ROUTELOC0 = (cfg->tx_loc << 8) | (cfg->rx_loc << 0);
+	usart->USART->ROUTEPEN = USART_ROUTEPEN_TXPEN | USART_ROUTEPEN_RXPEN;
 	
-	cfg->UART->CMD = USART_CMD_TXEN | USART_CMD_RXEN; // Enable TX
+	usart->USART->CMD = USART_CMD_TXEN | USART_CMD_RXEN; // Enable TX
 }
 
 /**
@@ -76,7 +81,7 @@ char	uart_rx_consume(t_uart_rx *rx)
 	if (rx->len == 0)
 		return ('\0');
 	c = rx->buffer[rx->tail];
-	rx->tail = (rx->tail + 1) % UART_BUFFER_SIZE;
+	rx->tail = (rx->tail + 1) % USART_BUFFER_SIZE;
 	--rx->len;
 	return (c);
 }
@@ -84,12 +89,12 @@ char	uart_rx_consume(t_uart_rx *rx)
 void	uart_rx_insert(t_uart_rx *rx, char c)
 {
 	rx->buffer[rx->head] = c;
-	rx->head = (rx->head + 1) % UART_BUFFER_SIZE;
+	rx->head = (rx->head + 1) % USART_BUFFER_SIZE;
 
-	if (rx->len < UART_BUFFER_SIZE)
+	if (rx->len < USART_BUFFER_SIZE)
 		++rx->len;
 	else
-		rx->tail = (rx->tail + 1) % UART_BUFFER_SIZE;
+		rx->tail = (rx->tail + 1) % USART_BUFFER_SIZE;
 }
 
 t_uart_rx	*get_uart_rx(USART_TypeDef *uart)

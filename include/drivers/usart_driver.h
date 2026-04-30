@@ -1,5 +1,5 @@
-#ifndef UART_DRIVER_H
-# define UART_DRIVER_H
+#ifndef USART_DRIVER_H
+# define USART_DRIVER_H
 
 #include <stddef.h>
 
@@ -7,7 +7,7 @@
 
 typedef struct
 {
-	USART_TypeDef	*UART;
+	USART_TypeDef	*USART;
 	uint32_t		baud_rate;
 	uint8_t			tx_pin;
 	uint8_t			tx_port;
@@ -17,22 +17,31 @@ typedef struct
 	uint8_t			rx_loc;
 	uint8_t			vcom_enable;
 
-}	UART_Config_TypeDef;
+}	t_usart_config;
 
 
-#define UART_BUFFER_SIZE	1024
-#define UART_RX_IFS			"\n\r"
+#define USART_BUFFER_SIZE		1024
+#define USART_RX_IFS			"\n\r"
 
 typedef struct s_uart_rx
 {
-	volatile char		buffer[UART_BUFFER_SIZE];
+	volatile char		buffer[USART_BUFFER_SIZE];
 	volatile uint16_t	len;
 	volatile uint16_t	head;
 	volatile uint16_t	tail;
 	volatile int32_t	ifs;
 }	t_uart_rx;
 
-void	uart_init(UART_Config_TypeDef *cfg);
+#include "lib/ringbuf.h"
+
+typedef struct s_usart
+{
+	USART_TypeDef	*USART;
+	t_ringbuf		ringbuf;
+}	t_usart;
+
+void	uart_init(t_usart *usart, const t_usart_config *cfg);
+
 void	uart_putchar(USART_TypeDef *UART, unsigned char c);
 char	uart_getchar(USART_TypeDef *UART);
 

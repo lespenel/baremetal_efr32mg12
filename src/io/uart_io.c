@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-#include "drivers/uart_driver.h"
+#include "drivers/usart_driver.h"
 #include "util.h"
 
 /**
@@ -92,13 +92,13 @@ size_t	uart_readline(USART_TypeDef *uart, char *buff, size_t size)
 	if (rx->ifs == -1)
 		return (0);
 	while (rx->len != 0 && i < size - 1 &&
-		bm_strchr(UART_RX_IFS, rx->buffer[rx->tail]) == NULL)
+		bm_strchr(USART_RX_IFS, rx->buffer[rx->tail]) == NULL)
 	{
 		buff[i] = uart_rx_consume(rx);
 		++i;
 	}
 	buff[i] = '\0';
-	while (rx->len && bm_strchr(UART_RX_IFS, rx->buffer[rx->tail]))
+	while (rx->len && bm_strchr(USART_RX_IFS, rx->buffer[rx->tail]))
 	{
 		uart_rx_consume(rx);
 		ifs_consumed = 1;
@@ -117,7 +117,7 @@ size_t	uart_read(USART_TypeDef *uart, char *buff, size_t size)
 	while (rx->len != 0 && i < size)
 	{
 		buff[i] = rx->buffer[rx->tail];
-		rx->tail = (rx->tail + 1) % UART_BUFFER_SIZE;
+		rx->tail = (rx->tail + 1) % USART_BUFFER_SIZE;
 		--rx->len;
 		++i;
 	}

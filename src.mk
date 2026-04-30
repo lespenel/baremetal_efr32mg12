@@ -4,7 +4,7 @@ SRC := main.c \
 	   drivers/dcdc_driver.c \
 	   drivers/gpio_driver.c \
 	   drivers/timer_driver.c \
-	   drivers/uart_driver.c \
+	   drivers/usart_driver.c \
 	   \
 	   platform/startup.c \
 	   platform/nvic.c \
@@ -15,7 +15,7 @@ SRC := main.c \
 	   bsp/leds.c \
 	   \
 	   irq/timer_irq.c \
-	   irq/uart_irq.c \
+	   irq/usart_irq.c \
 	   \
 	   lib/ringbuf.c \
 	   \
