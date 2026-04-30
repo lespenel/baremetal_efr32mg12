@@ -4,12 +4,13 @@
 #include "drivers/dcdc_driver.h"
 #include "drivers/timer_driver.h"
 
-#include "io/led_io.h"
+#include "bsp/leds.h"
+
 #include "io/uart_io.h"
 
 #include "scheduler.h"
 
-int main(void)
+void	board_init(void)
 {
 	DCDCInit();
 	init_hfxo();
@@ -25,6 +26,11 @@ int main(void)
 	config_usart3();
 	config_usart0();
 	timer0_init();
+}
+
+int main(void)
+{
+	board_init();
 
 	led1_toggle();
 	while (1)

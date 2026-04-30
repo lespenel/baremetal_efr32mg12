@@ -1,8 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "bsp/leds.h"
 #include "config.h"
-#include "io/led_io.h"
+
 #include "io/uart_io.h"
 #include "scheduler.h"
 #include "timer.h"

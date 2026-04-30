@@ -1,6 +1,4 @@
-SRC := startup.c \
-	   main.c \
-	   nvic.c \
+SRC := main.c \
 	   \
 	   drivers/clock_driver.c \
 	   drivers/dcdc_driver.c \
@@ -8,8 +6,12 @@ SRC := startup.c \
 	   drivers/timer_driver.c \
 	   drivers/uart_driver.c \
 	   \
+	   platform/startup.c \
+	   platform/nvic.c \
+	   \
 	   io/uart_io.c \
-	   io/led_io.c \
+	   \
+	   bsp/leds.c \
 	   \
 	   irq/timer_irq.c \
 	   irq/uart_irq.c \

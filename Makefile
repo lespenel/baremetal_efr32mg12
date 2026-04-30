@@ -28,6 +28,11 @@ include	src.mk
 DEP := $(patsubst %.c, $(BUILD_DIR)/%.d, $(SRC))
 OBJ := $(patsubst %.c, $(BUILD_DIR)/%.o, $(SRC))
 
+.PHONY: flash
+flash: $(NAME)
+	commander flash --serialno 440284829 $(NAME)
+
+
 .PHONY: all
 all: $(NAME)
 
