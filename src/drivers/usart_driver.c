@@ -10,11 +10,6 @@ static inline uint32_t	get_usart_clock_shift(USART_TypeDef *uart);
 static void	set_baud_rate(USART_TypeDef *UART, uint32_t baud_rate);
 static void	enable_vcom(void);
 
-static t_uart_rx	uart0_rx = {{0}, 0, 0, 0, -1};
-static t_uart_rx	uart1_rx = {{0}, 0, 0, 0, -1};
-static t_uart_rx	uart2_rx = {{0}, 0, 0, 0, -1};
-static t_uart_rx	uart3_rx = {{0}, 0, 0, 0, -1};
-
 #include "lib/ringbuf.h"
 
 /**
@@ -23,7 +18,7 @@ static t_uart_rx	uart3_rx = {{0}, 0, 0, 0, -1};
  *
  * @param cfg Configuration struct containing the USARTn
  */
-void	uart_init(t_usart *usart, const t_usart_config *cfg)
+void	usart_init(t_usart *usart, const t_usart_config *cfg)
 {
 	usart->USART = cfg->USART;
 	ringbuf_init(&usart->ringbuf);
@@ -55,57 +50,22 @@ void	uart_init(t_usart *usart, const t_usart_config *cfg)
 }
 
 /**
- * @brief send the char 'c' via the given UART
+ * @brief send the char 'c' via the given USART
  */
-void	uart_putchar(USART_TypeDef *UART, unsigned char c)
+void	usart_putc_poll(t_usart *usart, unsigned char c)
 {
-	UART->TXDATA = (uint32_t)c;
+	usart->USART->TXDATA = (uint32_t)c;
 
 	// Wait until the Transmission is complete
-	while ((UART->STATUS & USART_STATUS_TXC) == 0);
+	while ((usart->USART->STATUS & USART_STATUS_TXC) == 0);
 }
 
-char	uart_getchar(USART_TypeDef *UART)
+char	usart_gtc_poll(t_usart *usart)
 {
-	while ((UART->STATUS & USART_STATUS_RXDATAV) == 0);
-	char c = UART->RXDATA & 0xFFUL;
+	while ((usart->USART->STATUS & USART_STATUS_RXDATAV) == 0);
+	char c = usart->USART->RXDATA & 0xFFUL;
 
-	uart_putchar(UART, c);
 	return (c);
-}
-
-char	uart_rx_consume(t_uart_rx *rx)
-{
-	char	c;
-
-	if (rx->len == 0)
-		return ('\0');
-	c = rx->buffer[rx->tail];
-	rx->tail = (rx->tail + 1) % USART_BUFFER_SIZE;
-	--rx->len;
-	return (c);
-}
-
-void	uart_rx_insert(t_uart_rx *rx, char c)
-{
-	rx->buffer[rx->head] = c;
-	rx->head = (rx->head + 1) % USART_BUFFER_SIZE;
-
-	if (rx->len < USART_BUFFER_SIZE)
-		++rx->len;
-	else
-		rx->tail = (rx->tail + 1) % USART_BUFFER_SIZE;
-}
-
-t_uart_rx	*get_uart_rx(USART_TypeDef *uart)
-{
-	if (uart == USART0)
-		return (&uart0_rx);
-	if (uart == USART1)
-		return (&uart1_rx);
-	if (uart == USART2)
-		return (&uart2_rx);
-	return (&uart3_rx);
 }
 
 static inline uint32_t	get_usart_clock_shift(USART_TypeDef *uart)
@@ -122,12 +82,12 @@ static inline uint32_t	get_usart_clock_shift(USART_TypeDef *uart)
 }
 
 /**
- * @brief set the given baud_rate to the given UART (oversampling x16)
+ * @brief set the given baud_rate to the given USART (oversampling x16)
  */
-static void	set_baud_rate(USART_TypeDef *UART, uint32_t baud_rate)
+static void	set_baud_rate(USART_TypeDef *USART, uint32_t baud_rate)
 {
 	// br = fHFPERCLK/(oversample x (1 + USARTn_CLKDIV/256))
-	UART->CLKDIV = 256 * (HFX_FREQ / (16 * baud_rate) - 1);
+	USART->CLKDIV = 256 * (HFX_FREQ / (16 * baud_rate) - 1);
 }
 
 static void	enable_vcom(void)
