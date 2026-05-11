@@ -6,6 +6,4 @@
 #define LFX_FREQ				32768 UL
 
 
-#define CLI_PROMPT				"EFR32MG12> "
-
 #endif

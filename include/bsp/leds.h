@@ -1,5 +1,5 @@
-#ifndef LED_IO_H
-# define LED_IO_H
+#ifndef LEDS_H
+# define LEDS_H
 
 #include <stdint.h>
 

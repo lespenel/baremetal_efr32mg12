@@ -1,5 +1,5 @@
-#ifndef USART_H
-# define USART_H
+#ifndef USART_REG_H
+# define USART_REG_H
 
 #include <stdint.h>
 
