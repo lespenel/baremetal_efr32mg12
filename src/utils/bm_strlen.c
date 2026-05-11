@@ -5,7 +5,7 @@
  *
  * @return Length of the string
  */
-size_t	bm_strlen(char *str)
+size_t	bm_strlen(const char *str)
 {
 	size_t	len = 0;
 

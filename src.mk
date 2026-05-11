@@ -4,8 +4,7 @@ SRC := main.c \
 	   console/console.c \
 	   console/echo.c \
 	   console/help.c \
-	   console/inspect.c \
-	   console/send.c \
+	   console/clear.c \
 	   \
 	   drivers/clock_driver.c \
 	   drivers/dcdc_driver.c \

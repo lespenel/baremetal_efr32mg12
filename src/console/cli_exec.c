@@ -5,9 +5,11 @@ static void	unknown_command(char *cmd);
 
 int	cli_exec(int argc, char **argv)
 {
-	const t_cmd_map	cmd_map[] = {{"echo", echo},
-	{"help", help}, {"inspect", inspect}, {"i", inspect},
-	{"send", send}};
+	const t_cmd_map	cmd_map[] = {
+		{"echo", echo},
+		{"help", help},
+		{"clear", clear},
+	};
 
 	if (argc == 0)
 		return (0);
