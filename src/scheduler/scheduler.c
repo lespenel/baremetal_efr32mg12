@@ -7,7 +7,7 @@
 #include "scheduler.h"
 #include "timer.h"
 
-#include "console.h"
+// #include "console.h"
 
 void	led_task(void)
 {
@@ -18,7 +18,7 @@ void	led_task(void)
 #define TASKS_NB 2
 
 t_task	tasks[TASKS_NB] = {
-	{console_task, 0, 0},
+	// {console_task, 0, 0},
 	{led_task, 1000, 0},
 };
 

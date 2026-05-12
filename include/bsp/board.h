@@ -6,7 +6,7 @@
 
 void		board_init(void);
 
-t_usart		*board_get_usart0(void);
+t_usart		*board_get_usart3(void);
 
 t_serial	*board_get_serial0(void);
 

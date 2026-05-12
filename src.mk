@@ -1,10 +1,10 @@
 SRC := main.c \
 	   \
-	   console/cli_exec.c \
-	   console/console.c \
-	   console/echo.c \
-	   console/help.c \
-	   console/clear.c \
+	   debug_server/debug_server_init.c \
+	   debug_server/debug_server_poll.c \
+	   debug_server/debug_server_register_var.c \
+	   debug_server/debug_server_exec_cmd.c \
+	   debug_server/debug_server_inspect.c \
 	   \
 	   drivers/clock_driver.c \
 	   drivers/dcdc_driver.c \
@@ -23,6 +23,7 @@ SRC := main.c \
 	   irq/usart_irq.c \
 	   \
 	   interfaces/serial.c \
+	   interfaces/transport.c \
 	   \
 	   lib/ringbuf.c \
 	   \

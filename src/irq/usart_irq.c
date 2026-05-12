@@ -29,10 +29,10 @@ void	usart_rx_irq_handler(t_usart *usart)
 // 	uart_putchar(USART, c);
 // }
 
-void USART0_RX_IRQHandler(void)
-{
-	usart_rx_irq_handler(board_get_usart0());
-}
+// void USART0_RX_IRQHandler(void)
+// {
+// 	usart_rx_irq_handler(board_get_usart0());
+// }
 
 // void USART1_RX_IRQHandler(void)
 // {
@@ -44,7 +44,7 @@ void USART0_RX_IRQHandler(void)
 // 	usart_rx_irq_handler(board_get_usart2());
 // }
 //
-// void USART3_RX_IRQHandler(void)
-// {
-// 	usart_rx_irq_handler(board_get_usart3());
-// }
+void USART3_RX_IRQHandler(void)
+{
+	usart_rx_irq_handler(board_get_usart3());
+}
